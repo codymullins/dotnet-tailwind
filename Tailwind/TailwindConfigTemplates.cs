@@ -5,7 +5,7 @@ public static class TailwindConfigTemplates
     public const string Basic = """
                 /** @type {import('tailwindcss').Config} */
         module.exports = {
-            content: ["./Pages/**/*.{html,js,cshtml,razor}", "./Shared/**/*.{html,js,cshtml,razor}"],
+            content: ["*.razor", "./Pages/**/*.{html,js,cshtml,razor}", "./Shared/**/*.{html,js,cshtml,razor}"],
             plugins: [],
         }
         """;
@@ -15,7 +15,7 @@ public static class TailwindConfigTemplates
         const defaultTheme = require('tailwindcss/defaultTheme')
 
         module.exports = {
-            content: ["./Pages/**/*.{html,js,cshtml,razor}", "./Shared/**/*.{html,js,cshtml,razor}"],
+            content: ["*.razor", "./Pages/**/*.{html,js,cshtml,razor}", "./Shared/**/*.{html,js,cshtml,razor}"],
             theme: {
                 extend: {
                     fontFamily: {

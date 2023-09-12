@@ -23,7 +23,8 @@ public class App
         var project = _editor.LoadProject(cancel);
         await CreateBaseCssIfNotExists();
         await CreateTailwindConfigIfNotExists();
-        _editor.AddTargetIfNotExists(project);
+        _editor.AddTargetIfNotExists(project, ProjectEditor.InstallTailwindTarget);
+        _editor.AddTargetIfNotExists(project, ProjectEditor.TailwindTarget);
     }
 
     private async Task CreateTailwindConfigIfNotExists()

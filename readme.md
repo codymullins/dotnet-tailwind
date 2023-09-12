@@ -17,8 +17,12 @@ dotnet tool install tailwind
 dotnet tool run tailwind init
 ```
 
-2. Build your project. Tailwind will automatically generate an `app.css` in `wwwroot/css`
+2. Build your project. Tailwind will automatically generate `site.css` in `wwwroot/css`
 
-3. Add the `app.css` to your `App.razor` 
+3. Add the `site.css` to your `App.razor` 
 
-4. Anytime you build the solution, the `app.css` will now be regenerated.
+```
+<link rel="stylesheet" href="css/site.css" />
+```
+
+4. Anytime you build the solution, `site.css` will now be regenerated.

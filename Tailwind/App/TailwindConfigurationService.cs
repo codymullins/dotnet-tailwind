@@ -7,9 +7,6 @@ namespace Tailwind.App;
 
 public class TailwindConfigurationService(IAnsiConsole console, Project project, TailwindSettings settings)
 {
-    public const string TailwindTarget = "Tailwind";
-    public const string InstallTailwindTarget = "InstallTailwind";
-
     public static TailwindConfigurationService Create(IAnsiConsole console, TailwindSettings settings)
     {
         var cts = new CancellationTokenSource();
@@ -93,31 +90,45 @@ public class TailwindConfigurationService(IAnsiConsole console, Project project,
     public async Task<List<BuildTask>> GetBuildTasks()
     {
         var permissionTask = new BuildTask("Tailwind:Permission", "Building CSS with Tailwind", TaskType.Exec, [
-                new TargetParameter("Command", "$(TailwindExecutable) -i .\\tailwind.css -o .\\wwwroot\\css\\site.css")
+                new("Command", "$(TailwindExecutable) -i .\\tailwind.css -o .\\wwwroot\\css\\site.css")
             ],
             Platform: "Linux");
 
-        var installTaskWindows = new BuildTask("Tailwind:Install", "Installing Tailwind CLI", TaskType.Download, [
-            new TargetParameter("SkipUnchangedFiles", "true"),
-            new TargetParameter("SourceUrl", $"{GetInstallerUrl()}/tailwindcss-windows-x64.exe"),
-            new TargetParameter("DestinationFolder", "$(MSBuildProjectDirectory)")
-        ], Platform: "Windows");
+        List<TargetParameter> baseInstallParameters =
+        [
+            new("SkipUnchangedFiles", "true"),
+            new("DestinationFolder", "$(MSBuildProjectDirectory)")
+        ];
 
-        var installTaskLinux = installTaskWindows with {Name = "Tailwind:InstallLinux", Platform = "Linux", Parameters = [
-            new TargetParameter("SkipUnchangedFiles", "true"),
-            new TargetParameter("SourceUrl", $"{GetInstallerUrl()}/tailwindcss-linux-x64 "),
-            new TargetParameter("DestinationFolder", "$(MSBuildProjectDirectory)")
-        ]};
+        // todo: support arm64
+        // todo: there has to be a better way to do this
+        var installTaskWindows = new BuildTask(
+            "Tailwind:Install",
+            "Installing Tailwind CLI",
+            TaskType.Download,
+            [.. baseInstallParameters, new("SourceUrl", $"{GetInstallerUrl()}/tailwindcss-windows-x64.exe")],
+            Platform: "Windows");
 
-        var installTaskMac = installTaskWindows with {Name = "Tailwind:InstallMac", Platform = "MacOS", Parameters = [
-            new TargetParameter("SkipUnchangedFiles", "true"),
-            new TargetParameter("SourceUrl", $"{GetInstallerUrl()}/tailwindcss-macos-x64"),
-            new TargetParameter("DestinationFolder", "$(MSBuildProjectDirectory)")
-        ]};
+        var installTaskLinux = installTaskWindows with
+        {
+            Name = "Tailwind:InstallLinux",
+            Platform = "Linux",
+            Parameters = [.. baseInstallParameters, new("SourceUrl", $"{GetInstallerUrl()}/tailwindcss-linux-x64")]
+        };
 
-        var cssTask = new BuildTask("Tailwind:Run", "Building CSS with Tailwind", TaskType.Exec, [
-                    new TargetParameter("Command", "$(TailwindExecutable) -i .\\tailwind.css -o .\\wwwroot\\css\\site.css")],
-                DependsOnTask: permissionTask);
+        var installTaskMac = installTaskWindows with
+        {
+            Name = "Tailwind:InstallMac",
+            Platform = "MacOS",
+            Parameters = [.. baseInstallParameters, new("SourceUrl", $"{GetInstallerUrl()}/tailwindcss-macos-x64")]
+        };
+
+        var cssTask = new BuildTask(
+            "Tailwind:Run",
+            "Building CSS with Tailwind",
+            TaskType.Exec,
+            [new("Command", "$(TailwindExecutable) -i .\\tailwind.css -o .\\wwwroot\\css\\site.css")],
+            DependsOnTask: permissionTask);
 
         return [installTaskWindows, installTaskLinux, installTaskMac, permissionTask, cssTask];
     }

@@ -1,4 +1,4 @@
-﻿namespace Tailwind;
+﻿namespace Tailwind.Templates;
 
 public static class TailwindConfigTemplates
 {

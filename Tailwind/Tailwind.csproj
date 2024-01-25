@@ -1,35 +1,40 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-	<PropertyGroup>
-		<OutputType>Exe</OutputType>
-		<TargetFrameworks>net7.0;net8.0</TargetFrameworks>
-		<ImplicitUsings>enable</ImplicitUsings>
-		<Nullable>enable</Nullable>
-		<PublishAot>false</PublishAot>
-		<InvariantGlobalization>true</InvariantGlobalization>
-		<PackAsTool>true</PackAsTool>
-		<ToolCommandName>tailwind</ToolCommandName>
-		<PackageOutputPath>./nupkg</PackageOutputPath>
-		<AssemblyVersion>0.5.0.0</AssemblyVersion>
-		<Version>0.5.0.0</Version>
-		<PackageReleaseNotes>Removed dependency on npx/npm</PackageReleaseNotes>
-		<Authors>Cody Mullins</Authors>
-		<PackageReadmeFile>readme.md</PackageReadmeFile>
-		<PackageProjectUrl>https://github.com/codymullins/dotnet-tailwind</PackageProjectUrl>
-		<RepositoryUrl>https://github.com/codymullins/dotnet-tailwind
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFrameworks>net7.0;net8.0</TargetFrameworks>
+    <Nullable>enable</Nullable>
+    <WarningsAsErrors>Nullable</WarningsAsErrors>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <PublishAot>false</PublishAot>
+    <InvariantGlobalization>true</InvariantGlobalization>
+    <PackAsTool>true</PackAsTool>
+    <LangVersion>latest</LangVersion>
+    <ToolCommandName>tailwind</ToolCommandName>
+    <PackageOutputPath>./nupkg</PackageOutputPath>
+    <Version>0.7.0.0</Version>
+    <PackageReleaseNotes>Removed dependency on npx/npm</PackageReleaseNotes>
+    <Authors>Cody Mullins</Authors>
+    <PackageReadmeFile>readme.md</PackageReadmeFile>
+    <PackageProjectUrl>https://github.com/codymullins/dotnet-tailwind</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/codymullins/dotnet-tailwind
 		</RepositoryUrl>
-		<PackageTags>tailwind;blazor</PackageTags>
-		<PackageLicenseExpression>MIT</PackageLicenseExpression>
-		<PackageDescription>Automatically add Tailwind to your Blazor application</PackageDescription>
-	</PropertyGroup>
-	<ItemGroup>
-		<None Include="readme.md" Pack="true" PackagePath="\" />
-	</ItemGroup>
-	<ItemGroup>
-		<PackageReference Include="Microsoft.Build" Version="17.7.2" ExcludeAssets="runtime" />
-		<PackageReference Include="Microsoft.Build.Locator" Version="1.6.1" />
-		<PackageReference Include="Microsoft.Build.Utilities.Core" Version="17.7.2" ExcludeAssets="runtime" />
-		<PackageReference Include="Microsoft.Extensions.Hosting" Version="7.0.1" />
-		<PackageReference Include="Microsoft.Extensions.Logging" Version="8.0.0-preview.7.23375.6" />
-		<PackageReference Include="Microsoft.Extensions.Logging.Console" Version="8.0.0-preview.7.23375.6" />
-	</ItemGroup>
+    <PackageTags>tailwind;blazor</PackageTags>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageDescription>Automatically add Tailwind to your Blazor application</PackageDescription>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="readme.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Build" Version="17.7.2" ExcludeAssets="runtime" />
+    <PackageReference Include="Microsoft.Build.Locator" Version="1.6.1" />
+    <PackageReference Include="Microsoft.Build.Utilities.Core" Version="17.7.2" ExcludeAssets="runtime" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="7.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="8.0.0-preview.7.23375.6" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="8.0.0-preview.7.23375.6" />
+    <PackageReference Include="Spectre.Console" Version="0.48.0" />
+    <PackageReference Include="Spectre.Console.Cli" Version="0.48.0" />
+  </ItemGroup>
+
 </Project>

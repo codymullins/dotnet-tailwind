@@ -89,8 +89,8 @@ public class TailwindConfigurationService(IAnsiConsole console, Project project,
 
     public async Task<List<BuildTask>> GetBuildTasks()
     {
-        var permissionTask = new BuildTask("Tailwind:Permission", "Building CSS with Tailwind", TaskType.Exec, [
-                new("Command", "$(TailwindExecutable) -i .\\tailwind.css -o .\\wwwroot\\css\\site.css")
+        var permissionTask = new BuildTask("Tailwind:Permission", "Making Tailwind CLI executable", TaskType.Exec, [
+                new("Command", "chmod +x $(TailwindExecutable)")
             ],
             Platform: "Linux");
 

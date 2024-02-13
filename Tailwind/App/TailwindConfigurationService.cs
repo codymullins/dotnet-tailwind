@@ -92,7 +92,7 @@ public class TailwindConfigurationService(IAnsiConsole console, Project project,
         var permissionTask = new BuildTask("Tailwind:Permission", "Making Tailwind CLI executable", TaskType.Exec, [
                 new("Command", "chmod +x $(TailwindExecutable)")
             ],
-            Platform: "Linux");
+            Platforms: ["Linux", "OSX"]);
 
         List<TargetParameter> baseInstallParameters =
         [
@@ -107,19 +107,19 @@ public class TailwindConfigurationService(IAnsiConsole console, Project project,
             "Installing Tailwind CLI",
             TaskType.Download,
             [.. baseInstallParameters, new("SourceUrl", $"{GetInstallerUrl()}/tailwindcss-windows-x64.exe")],
-            Platform: "Windows");
+            Platforms: ["Windows"]);
 
         var installTaskLinux = installTaskWindows with
         {
             Name = "Tailwind:InstallLinux",
-            Platform = "Linux",
+            Platforms = ["Linux"],
             Parameters = [.. baseInstallParameters, new("SourceUrl", $"{GetInstallerUrl()}/tailwindcss-linux-x64")]
         };
 
         var installTaskMac = installTaskWindows with
         {
             Name = "Tailwind:InstallMac",
-            Platform = "MacOS",
+            Platforms = ["OSX"],
             Parameters = [.. baseInstallParameters, new("SourceUrl", $"{GetInstallerUrl()}/tailwindcss-macos-x64")]
         };
 
@@ -200,9 +200,15 @@ public class TailwindConfigurationService(IAnsiConsole console, Project project,
                 taskElement.SetParameter(parameter.Key, parameter.Value);
             }
 
-            if (buildTask.Platform != null)
+            if (buildTask.Platforms != null && buildTask.Platforms.Any())
             {
-                target.Condition = $"$([MSBuild]::IsOSPlatform('{buildTask.Platform}'))";
+                string condition = $"$([MSBuild]::IsOSPlatform('{buildTask.Platforms.First()}'))";
+                foreach (var platform in buildTask.Platforms.Skip(1))
+                {
+                    condition += $"OR $([MSBuild]::IsOSPlatform('{platform}'))";   
+                }
+
+                taskElement.Condition = condition;
             }
 
             if (buildTask.TaskType == TaskType.Download)
@@ -215,7 +221,7 @@ public class TailwindConfigurationService(IAnsiConsole console, Project project,
     }
 }
 
-public record BuildTask(string Name, string Description, TaskType TaskType, List<TargetParameter> Parameters, BuildTask? DependsOnTask = null, string? Platform = null);
+public record BuildTask(string Name, string Description, TaskType TaskType, List<TargetParameter> Parameters, BuildTask? DependsOnTask = null, List<string>? Platforms = null);
 public enum TaskType
 {
     Message,

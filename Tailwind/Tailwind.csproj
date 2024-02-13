@@ -11,7 +11,7 @@
     <LangVersion>latest</LangVersion>
     <ToolCommandName>tailwind</ToolCommandName>
     <PackageOutputPath>./nupkg</PackageOutputPath>
-    <Version>0.7.0-alpha</Version>
+    <Version>0.7.0</Version>
     <PackageReleaseNotes>Added remove command, changed init pattern</PackageReleaseNotes>
     <Authors>Cody Mullins</Authors>
     <PackageReadmeFile>readme.md</PackageReadmeFile>

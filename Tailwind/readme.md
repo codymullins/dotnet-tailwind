@@ -4,21 +4,43 @@ Really basic tool to bootstrap Tailwind in .NET Blazor projects.
 
 Run `dotnet tailwind init` to automatically create the necessary build targets and files for a basic Tailwind integration.
 
-## Install
-```
+## Installation
+
+```sh
+cd <repository root directory>
+dotnet new tool-manifest
 dotnet tool install tailwind
 ```
 
-## How to use
+## Initializing Tailwind
 
-1. In the directory with your `.csproj`:
-
+```sh
+cd .\path\to\project
+dotnet tailwind init
 ```
-dotnet tool run tailwind init
+
+**Add to your `App.razor` in the `<head>`:**
+
+```html
+<link rel="stylesheet" href="css/site.css" />
 ```
 
-2. Build your project. Tailwind will automatically generate an `app.css` in `wwwroot/css`
+Anytime you build the solution, `wwwroot/css/site.css` will now be regenerated.
 
-3. Add the `app.css` to your `App.razor` 
+## Updating Tailwind
 
-4. Anytime you build the solution, the `app.css` will now be regenerated.
+```sh
+dotnet tailwind update
+```
+
+## Support
+
+We support the below versions. The tool may work with versions outside this range, but we're not actively testing them. Your mileage may vary.
+
+| .NET 6 | .NET 7 | .NET 8 | .NET 9 |
+| -- | -- | -- | -- |
+| ❌ | ✅ | ✅ |  |
+
+## Sponsors
+
+Sponsored by [PureBlazor](https://pureblazor.com)

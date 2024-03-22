@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Tailwind": {
+      "commandName": "Project",
+      "commandLineArgs": "init -d G:\\repos\\pureblazor\\components"
+    }
+  }
+}

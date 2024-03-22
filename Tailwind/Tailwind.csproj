@@ -10,15 +10,16 @@
     <PackAsTool>true</PackAsTool>
     <LangVersion>latest</LangVersion>
     <ToolCommandName>tailwind</ToolCommandName>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <PackageOutputPath>./nupkg</PackageOutputPath>
     <Version>0.8.0-alpha.1</Version>
-    <PackageReleaseNotes>Added remove command, changed init pattern</PackageReleaseNotes>
+    <PackageReleaseNotes>Added remove command, changed init pattern, mac ARM</PackageReleaseNotes>
     <Authors>Cody Mullins</Authors>
     <PackageReadmeFile>readme.md</PackageReadmeFile>
     <PackageProjectUrl>https://github.com/codymullins/dotnet-tailwind</PackageProjectUrl>
     <RepositoryUrl>https://github.com/codymullins/dotnet-tailwind
 		</RepositoryUrl>
-    <PackageTags>tailwind;blazor</PackageTags>
+    <PackageTags>tailwind blazor</PackageTags>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageDescription>Automatically add Tailwind to your Blazor application</PackageDescription>
   </PropertyGroup>

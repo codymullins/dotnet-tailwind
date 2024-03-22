@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using Microsoft.Build.Construction;
 using Microsoft.Build.Evaluation;
 using Spectre.Console;
 using Tailwind.Templates;
@@ -37,7 +38,7 @@ public class TailwindConfigurationService(IAnsiConsole console, Project project,
         if (!File.Exists(path))
         {
             console.MarkupLineInterpolated($"{path} not found, creating one for you...");
-            var contents = "@tailwind base;\n@tailwind components;\n@tailwind utilities;";
+            const string contents = "@tailwind base;\n@tailwind components;\n@tailwind utilities;";
             await CreateFile(path, contents);
         }
     }
@@ -51,13 +52,7 @@ public class TailwindConfigurationService(IAnsiConsole console, Project project,
     {
         var files = await GetPluginFiles();
         List<string> filesToRemove = [];
-        foreach (var file in files)
-        {
-            if (File.Exists(file))
-            {
-                filesToRemove.Add(file);
-            }
-        }
+        filesToRemove.AddRange(files.Where(File.Exists));
 
         if (!apply)
         {
@@ -73,7 +68,7 @@ public class TailwindConfigurationService(IAnsiConsole console, Project project,
         return filesToRemove;
     }
 
-    public async Task<List<string>> GetPluginFiles()
+    private Task<List<string>> GetPluginFiles()
     {
         List<string> files =
         [
@@ -84,15 +79,15 @@ public class TailwindConfigurationService(IAnsiConsole console, Project project,
             GetNormalizedPath("wwwroot/css/site.css")
         ];
 
-        return files;
+        return Task.FromResult(files);
     }
 
-    public async Task<List<BuildTask>> GetBuildTasks()
+    private Task<List<BuildTask>> GetBuildTasks()
     {
         var permissionTask = new BuildTask("Tailwind:Permission", "Making Tailwind CLI executable", TaskType.Exec, [
                 new("Command", "chmod +x $(TailwindExecutable)")
             ],
-            Platforms: [new OSPlatform("Linux"), new OSPlatform("OSX"), new OSPlatform("OSX", "arm64")]);
+            Platforms: [new OsPlatform("Linux"), new OsPlatform("OSX"), new OsPlatform("OSX", "arm64")]);
 
         List<TargetParameter> baseInstallParameters =
         [
@@ -100,33 +95,32 @@ public class TailwindConfigurationService(IAnsiConsole console, Project project,
             new("DestinationFolder", "$(MSBuildProjectDirectory)")
         ];
 
-        // todo: support arm64
         // todo: there has to be a better way to do this
         var installTaskWindows = new BuildTask(
             "Tailwind:Install",
             "Installing Tailwind CLI",
             TaskType.Download,
             [.. baseInstallParameters, new("SourceUrl", $"{GetInstallerUrl()}/tailwindcss-windows-x64.exe")],
-            Platforms: [new OSPlatform("Windows")]);
+            Platforms: [new OsPlatform("Windows")]);
 
         var installTaskLinux = installTaskWindows with
         {
             Name = "Tailwind:InstallLinux",
-            Platforms = [new OSPlatform("Linux")],
+            Platforms = [new OsPlatform("Linux")],
             Parameters = [.. baseInstallParameters, new("SourceUrl", $"{GetInstallerUrl()}/tailwindcss-linux-x64")]
         };
 
         var installTaskMac = installTaskWindows with
         {
             Name = "Tailwind:InstallMac",
-            Platforms = [new OSPlatform("OSX")],
+            Platforms = [new OsPlatform("OSX")],
             Parameters = [.. baseInstallParameters, new("SourceUrl", $"{GetInstallerUrl()}/tailwindcss-macos-x64")]
         };
 
         var installTaskMacArm = installTaskWindows with
         {
             Name = "Tailwind:InstallMacArm",
-            Platforms = [new OSPlatform("OSX", "arm64")],
+            Platforms = [new OsPlatform("OSX", "arm64")],
             Parameters = [.. baseInstallParameters, new("SourceUrl", $"{GetInstallerUrl()}/tailwindcss-macos-arm64")]
         };
         
@@ -137,19 +131,17 @@ public class TailwindConfigurationService(IAnsiConsole console, Project project,
             [new("Command", "$(TailwindExecutable) -i .\\tailwind.css -o .\\wwwroot\\css\\site.css")],
             DependsOnTask: permissionTask);
 
-        return [installTaskWindows, installTaskLinux, installTaskMac, installTaskMacArm, permissionTask, cssTask];
+        return Task.FromResult<List<BuildTask>>([installTaskWindows, installTaskLinux, installTaskMac, installTaskMacArm, permissionTask, cssTask]);
     }
 
     public async Task RemoveBuildTasks()
     {
         var tasks = await GetBuildTasks();
-        foreach (var buildTask in tasks)
+        foreach (var target in tasks
+                     .Select(buildTask => project.Xml.Targets.FirstOrDefault(p => p.Name == buildTask.Name))
+                     .OfType<ProjectTargetElement>())
         {
-            var target = project.Xml.Targets.FirstOrDefault(p => p.Name == buildTask.Name);
-            if (target != null)
-            {
-                target.RemoveAllChildren();
-            }
+            target.RemoveAllChildren();
         }
 
         project.Save();
@@ -209,11 +201,9 @@ public class TailwindConfigurationService(IAnsiConsole console, Project project,
 
             if (buildTask.Platforms != null && buildTask.Platforms.Any())
             {
-                string condition = $"$([MSBuild]::IsOSPlatform('{buildTask.Platforms.First().Name}')) AND '$([System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture)' == '{buildTask.Platforms.First().Arch.ToUpper()}'";
-                foreach (var platform in buildTask.Platforms.Skip(1))
-                {
-                    condition += $"OR $([MSBuild]::IsOSPlatform('{platform.Name}')) AND '$([System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture)' == '{platform.Arch.ToUpper()}'";   
-                }
+                var condition = $"($([MSBuild]::IsOSPlatform('{buildTask.Platforms.First().Name}')) AND '$([System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture)' == '{buildTask.Platforms.First().Arch.ToUpper()}')";
+                condition = buildTask.Platforms.Skip(1)
+                    .Aggregate(condition, (current, platform) => current + $" OR ($([MSBuild]::IsOSPlatform('{platform.Name}')) AND '$([System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture)' == '{platform.Arch.ToUpper()}')");
 
                 taskElement.Condition = condition;
             }
@@ -228,8 +218,8 @@ public class TailwindConfigurationService(IAnsiConsole console, Project project,
     }
 }
 
-public record BuildTask(string Name, string Description, TaskType TaskType, List<TargetParameter> Parameters, BuildTask? DependsOnTask = null, List<OSPlatform>? Platforms = null);
-public record OSPlatform(string Name, string Arch = "x64");
+public record BuildTask(string Name, string Description, TaskType TaskType, List<TargetParameter> Parameters, BuildTask? DependsOnTask = null, List<OsPlatform>? Platforms = null);
+public record OsPlatform(string Name, string Arch = "x64");
 public enum TaskType
 {
     Message,

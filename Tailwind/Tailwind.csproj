@@ -12,7 +12,7 @@
     <ToolCommandName>tailwind</ToolCommandName>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <PackageOutputPath>./nupkg</PackageOutputPath>
-    <Version>0.8.0-alpha.2</Version>
+    <Version>0.8.0-alpha.3</Version>
     <PackageReleaseNotes>Added remove command, changed init pattern, mac ARM</PackageReleaseNotes>
     <Authors>Cody Mullins</Authors>
     <PackageReadmeFile>readme.md</PackageReadmeFile>

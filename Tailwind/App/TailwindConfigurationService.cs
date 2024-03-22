@@ -125,7 +125,7 @@ public class TailwindConfigurationService(IAnsiConsole console, Project project,
 
         var installTaskMacArm = installTaskWindows with
         {
-            Name = "Tailwind:InstallMac",
+            Name = "Tailwind:InstallMacArm",
             Platforms = [new OSPlatform("OSX", "arm64")],
             Parameters = [.. baseInstallParameters, new("SourceUrl", $"{GetInstallerUrl()}/tailwindcss-macos-arm64")]
         };
